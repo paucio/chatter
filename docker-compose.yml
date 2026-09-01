@@ -1,0 +1,45 @@
+# Runs the production image (see Dockerfile) locally against a Postgres container.
+#
+#   docker compose up --build
+#   open http://localhost:3000
+#
+# The web container boots via bin/docker-entrypoint, which runs `db:prepare`
+# (creates + migrates the primary/cache/queue/cable databases) before starting
+# the server. Thruster listens on port 80 in the container and proxies to Puma.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      # Must match what config/database.yml expects in production:
+      #   username: chatter   password: CHATTER_DATABASE_PASSWORD
+      POSTGRES_USER: chatter
+      POSTGRES_PASSWORD: ${CHATTER_DATABASE_PASSWORD:-chatter}
+      POSTGRES_DB: chatter_production
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatter -d chatter_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    ports:
+      - "3000:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: db
+      CHATTER_DATABASE_PASSWORD: ${CHATTER_DATABASE_PASSWORD:-chatter}
+      # Run the Solid Queue supervisor inside Puma — no separate worker container.
+      SOLID_QUEUE_IN_PUMA: "true"
+    volumes:
+      # Supply the credentials key without baking it into the image
+      # (.dockerignore excludes it from the build).
+      - ./config/master.key:/rails/config/master.key:ro
+
+volumes:
+  db-data:
