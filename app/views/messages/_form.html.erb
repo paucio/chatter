@@ -1,0 +1,9 @@
+<%# Message composer. Re-rendered by messages/create.turbo_stream.erb to clear
+    the body after a send (keeping the entered username). %>
+<%= form_with model: [ chatroom, message ], id: "message_form", class: "space-y-2" do |form| %>
+  <%= form.text_field :username, placeholder: "Write your user name here", required: true,
+        class: "w-full border p-1" %>
+  <%= form.text_area :body, placeholder: "Write your message here", rows: 4, required: true,
+        class: "w-full border p-1 resize-y" %>
+  <%= form.submit "Submit", class: "border px-3 py-1" %>
+<% end %>

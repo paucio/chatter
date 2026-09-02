@@ -1,0 +1,13 @@
+<%= turbo_stream.update "panel" do %>
+  <%= render "panel", chatroom: @chatroom %>
+<% end %>
+
+<%= turbo_stream.append "map" do %>
+  <span data-map-target="marker"
+        data-chatroom-id="<%= @chatroom.id %>"
+        data-latitude="<%= @chatroom.latitude %>"
+        data-longitude="<%= @chatroom.longitude %>"
+        data-title="<%= @chatroom.title %>"
+        hidden>
+  </span>
+<% end %> 

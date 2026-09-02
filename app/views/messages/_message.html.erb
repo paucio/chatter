@@ -1,0 +1,4 @@
+<div id="<%= dom_id(message) %>" class="mb-2">
+    <strong><%= message.username %>:</strong> <%= message.body %>
+    <div class="text-xs text-gray-400"><%= message.created_at.strftime("%d/%m/%Y %H:%M") %></div>
+</div>

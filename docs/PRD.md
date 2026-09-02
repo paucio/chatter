@@ -39,8 +39,8 @@ Two tables. No `User`, no auth — a username is free text typed per message, as
 | Column | Type | Notes |
 | --- | --- | --- |
 | `title` | string, not null | Set server-side: `"Chatroom #{count + 1}"`. |
-| `latitude` | decimal(9,6), not null | Validated `-90..90`. |
-| `longitude` | decimal(9,6), not null | Validated `-180..180`. |
+| `latitude` | float, not null | Model-validated `-90..90`. Coordinates come straight from Leaflet. |
+| `longitude` | float, not null | Model-validated `-180..180`. |
 | timestamps | | |
 
 **`messages`**
