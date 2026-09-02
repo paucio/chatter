@@ -1,0 +1,12 @@
+<div class="p-4">
+  <h2 class="font-bold text-lg"><%= @chatroom.title %></h2>
+
+  <%# Subscribes this tab to Action Cable updates for this chatroom %>
+  <%= turbo_stream_from @chatroom %>
+
+  <div id="messages" class="mt-4 h-64 overflow-y-auto border p-2">
+    <%= render @chatroom.messages.order(:created_at) %>
+  </div>
+
+  <%= render "messages/form", chatroom: @chatroom, message: @chatroom.messages.new %>
+</div>

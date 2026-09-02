@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Chatroom < ApplicationRecord
   has_many :messages, dependent: :destroy
 
@@ -7,7 +9,7 @@ class Chatroom < ApplicationRecord
   validates :longitude, presence: true,
     numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }
 
-  before_create :set_default_title
+  before_validation :set_default_title, on: :create
 
   private
 

@@ -1,0 +1,6 @@
+<%# Reset the composer: fresh body, keep the username the sender just used. %>
+<%= turbo_stream.replace "message_form" do %>
+  <%= render "messages/form",
+        chatroom: @chatroom,
+        message: @chatroom.messages.new(username: @message.username) %>
+<% end %>
