@@ -6,7 +6,9 @@ development:
   adapter: async
 
 test:
-  adapter: test
+  # async (in-process pub/sub) rather than :test so Turbo Stream broadcasts are
+  # actually delivered to the browser during system specs.
+  adapter: async
 
 production:
   adapter: solid_cable

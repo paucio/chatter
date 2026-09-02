@@ -22,7 +22,7 @@ export default class extends Controller {
     const marker = L.marker([parseFloat(latitude), parseFloat(longitude)]).addTo(this.map)
     marker.on("click", (event) => {
       L.DomEvent.stopPropagation(event)
-      Turbo.visit(`/chatrooms/${chatroomId}`, {frame: "panel"})
+      document.getElementById("panel").src = `/chatrooms/${chatroomId}`
     })
   }
 
@@ -31,7 +31,7 @@ export default class extends Controller {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content ?? "",
         Accept: "text/vnd.turbo-stream.html",
       },
       body: JSON.stringify({
