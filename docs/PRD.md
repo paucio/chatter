@@ -69,7 +69,7 @@ New pins are **not** broadcast — another user's pin appears on your next load.
 
 - **The server is the source of truth.** Everything persists in Postgres (FR5); no `localStorage`, no client store.
 - Each page load renders the map, all existing pins, and either the selected room or the "Click on the map to start a chat" placeholder.
-- **Select a room:** `GET /chatrooms/:id` into a `#chatroom-panel` Turbo Frame; the URL updates so rooms are linkable and the back button works.
+- **Select a room:** `GET /chatrooms/:id` into a `panel` Turbo Frame.
 - **Create a pin:** `POST /chatrooms` with the clicked coordinates; the response adds the marker and swaps in the new room's panel.
 - **Client state** is just the Leaflet instance, owned by `map_controller` and torn down in `disconnect()`. No business logic in JS.
 
