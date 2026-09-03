@@ -24,10 +24,9 @@ See [`docs/PRD.md`](docs/PRD.md) for the full functional spec and [`docs/`](docs
 - **Server-rendered, Hotwire-first.** No SPA, no client-side framework. Stimulus controllers are thin glue around Leaflet and form behavior only.
 - **Real-time via Turbo Streams over Action Cable** (`solid_cable`). Posting a message broadcasts a `turbo_stream` append to everyone subscribed to that chatroom.
 - **Data model** (keep it minimal):
-  - `Chatroom` — `title`, `latitude`, `longitude`. Title auto-assigned as
+  - `Chatroom` — `title`, `latitude`, `longitude`, `timestamps`. Title auto-assigned as
     `"Chatroom N"` on create.
-  - `Message` — `belongs_to :chatroom`, `username` (free text, from the form),
-    `body`, `created_at`.
+  - `Message` — `belongs_to :chatroom`, `username`, `body`, `timestamps`.
   - No `User` model, no authentication. Username is just a string typed into the form, matching the mockup.
 - **State**: persistence is the database. No `localStorage`, no session storage for domain data — "stored between sessions" means server-side.
 - **Map <-> panel**: clicking the map POSTs a new `Chatroom`; clicking a marker
