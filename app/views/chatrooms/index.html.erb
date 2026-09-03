@@ -3,6 +3,11 @@
     <%= render partial: "marker", collection: @chatrooms, as: :chatroom %>
   </div>
 
+  <%= form_with url: chatrooms_path, id: "new-chatroom-form", class: "hidden" do |form| %>
+    <%= form.hidden_field "chatroom[latitude]",  id: "new-chatroom-latitude" %>
+    <%= form.hidden_field "chatroom[longitude]", id: "new-chatroom-longitude" %>
+  <% end %>
+
   <div class="w-1/3 h-full border-l overflow-y-auto">
     <%= turbo_frame_tag "panel" do %>
       <p class="p-4 text-gray-500">Click on the map to start a chat</p>

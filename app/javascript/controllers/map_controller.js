@@ -40,18 +40,9 @@ export default class extends Controller {
   }
 
   createChatroom = (event) => {
-    fetch("/chatrooms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content ?? "",
-        Accept: "text/vnd.turbo-stream.html",
-      },
-      body: JSON.stringify({
-        chatroom: { latitude: event.latlng.lat, longitude: event.latlng.lng },
-      }),
-    })
-      .then((response) => response.text())
-      .then((html) => Turbo.renderStreamMessage(html))
+    const form = document.getElementById("new-chatroom-form")
+    document.getElementById("new-chatroom-latitude").value  = event.latlng.lat
+    document.getElementById("new-chatroom-longitude").value = event.latlng.lng
+    form.requestSubmit()
   }
 }
