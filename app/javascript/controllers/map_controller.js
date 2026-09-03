@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 import L from "leaflet"
 
-
+// Connects to data-controller="map"
 export default class extends Controller {
   static targets = ["marker"]
 
-  initialize() {
+  connect() {
     this.map = L.map(this.element).setView([48.8, 10], 4)
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -13,12 +13,25 @@ export default class extends Controller {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map)
 
-    this.map.on("click", (event) => this.createChatroom(event))
+    this.map.on("click", this.createChatroom)
+
+    // Targets that connected before the map existed.
+    this.markerTargets.forEach((element) => this.#addMarker(element))
+  }
+
+  disconnect() {
+    this.map?.remove()
+    this.map = null
   }
 
   markerTargetConnected(element) {
-    const { chatroomId, latitude, longitude } = element.dataset
+    this.#addMarker(element)
+  }
 
+  #addMarker(element) {
+    if (!this.map) return // connect() will sweep it
+
+    const { chatroomId, latitude, longitude } = element.dataset
     const marker = L.marker([parseFloat(latitude), parseFloat(longitude)]).addTo(this.map)
     marker.on("click", (event) => {
       L.DomEvent.stopPropagation(event)
@@ -26,7 +39,7 @@ export default class extends Controller {
     })
   }
 
-  createChatroom(event) {
+  createChatroom = (event) => {
     fetch("/chatrooms", {
       method: "POST",
       headers: {
@@ -35,10 +48,7 @@ export default class extends Controller {
         Accept: "text/vnd.turbo-stream.html",
       },
       body: JSON.stringify({
-        chatroom: {
-          latitude: event.latlng.lat,
-          longitude: event.latlng.lng,
-        },
+        chatroom: { latitude: event.latlng.lat, longitude: event.latlng.lng },
       }),
     })
       .then((response) => response.text())

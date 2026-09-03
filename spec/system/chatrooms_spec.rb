@@ -56,4 +56,16 @@ RSpec.describe "Chatrooms", type: :system do
       end
     end
   end
+
+  it "rebuilds the map cleanly after a Turbo navigation" do
+    Chatroom.create!(latitude: 48.0, longitude: 10.0)
+    visit root_path
+    expect(page).to have_css(".leaflet-marker-icon")
+
+    page.execute_script("Turbo.visit(window.location.href)")
+
+    expect(page).to have_css("#map .leaflet-tile-loaded", wait: 10)
+    expect(page).to have_css(".leaflet-marker-icon")           # markers replaced, not doubled
+    expect(page).to have_css(".leaflet-marker-icon", count: 1)
+  end
 end
