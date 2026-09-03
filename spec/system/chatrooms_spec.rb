@@ -7,25 +7,23 @@ RSpec.describe "Chatrooms", type: :system do
 
     find("#map").click
 
-    within "#panel" do
-      expect(page).to have_content("Chatroom 1")
-    end
     expect(page).to have_css(".leaflet-marker-icon")
     expect(Chatroom.count).to eq(1)
+    within("#panel") { expect(page).to have_content(Chatroom.sole.title) }
   end
 
   it "opens a chatroom's panel when its marker is clicked" do
-    Chatroom.create!(latitude: 50.0, longitude: 4.0)   # Chatroom 1
-    Chatroom.create!(latitude: 46.0, longitude: 16.0)  # Chatroom 2
+    first  = Chatroom.create!(latitude: 50.0, longitude: 4.0)
+    second = Chatroom.create!(latitude: 46.0, longitude: 16.0)
 
     visit root_path
     expect(page).to have_css(".leaflet-marker-icon", count: 2)
 
     all(".leaflet-marker-icon").last.click
-    within("#panel") { expect(page).to have_content("Chatroom 2") }
+    within("#panel") { expect(page).to have_content(second.title) }
 
     all(".leaflet-marker-icon").first.click
-    within("#panel") { expect(page).to have_content("Chatroom 1") }
+    within("#panel") { expect(page).to have_content(first.title) }
 
     # panel swaps in place — the map is still there
     expect(page).to have_css("#map")

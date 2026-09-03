@@ -8,12 +8,10 @@ RSpec.describe Chatroom, type: :model do
   end
 
   describe "title" do
-    it "is auto-assigned as \"Chatroom N\" from the current count" do
-      Chatroom.create!(latitude: 10.0, longitude: 10.0)
-
+    it "is auto-assigned as \"Chatroom <id>\" on create" do
       chatroom.save!
 
-      expect(chatroom.title).to eq("Chatroom 2")
+      expect(chatroom.title).to eq("Chatroom #{chatroom.id}")
     end
 
     it "keeps an explicitly provided title" do

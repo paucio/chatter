@@ -8,7 +8,7 @@ class MessagesController < ApplicationController
     # The message row reaches every subscriber (sender included) via the
     # broadcast; this response only resets the composer.
   rescue ActiveRecord::RecordInvalid
-    head :unprocessable_entity
+    head :unprocessable_content
   end
 
   private

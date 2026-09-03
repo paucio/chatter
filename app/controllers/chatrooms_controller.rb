@@ -7,6 +7,8 @@ class ChatroomsController < ApplicationController
 
   def create
     @chatroom = Chatroom.create!(chatroom_params)
+  rescue ActiveRecord::RecordInvalid
+    head :unprocessable_content
   end
 
   def show
