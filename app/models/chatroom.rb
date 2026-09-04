@@ -11,9 +11,15 @@ class Chatroom < ApplicationRecord
 
   before_validation :set_default_title, on: :create
 
+  after_create -> { update_column(:title, "Chatroom #{id}") if generated_title? }
+
   private
 
   def set_default_title
-    self.title = "Chatroom #{Chatroom.count + 1}" if title.blank?
+    self.title = "Chatroom" if title.blank?
+  end
+
+  def generated_title?
+    title == "Chatroom"
   end
 end

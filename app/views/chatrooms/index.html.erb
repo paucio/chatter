@@ -1,14 +1,12 @@
 <div class="flex h-screen">
   <div id="map" data-controller="map" class="w-2/3 h-full">
-    <% @chatrooms.each do |chatroom| %>
-      <span data-map-target="marker"
-            data-chatroom-id="<%= chatroom.id %>"
-            data-latitude="<%= chatroom.latitude %>"
-            data-longitude="<%= chatroom.longitude %>"
-            data-title="<%= chatroom.title %>"
-            hidden></span>
-    <% end %>
+    <%= render partial: "marker", collection: @chatrooms, as: :chatroom %>
   </div>
+
+  <%= form_with url: chatrooms_path, id: "new-chatroom-form", class: "hidden" do |form| %>
+    <%= form.hidden_field "chatroom[latitude]",  id: "new-chatroom-latitude" %>
+    <%= form.hidden_field "chatroom[longitude]", id: "new-chatroom-longitude" %>
+  <% end %>
 
   <div class="w-1/3 h-full border-l overflow-y-auto">
     <%= turbo_frame_tag "panel" do %>
