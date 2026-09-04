@@ -2,6 +2,25 @@
 
 **Scope:** whole app — `app/`, `config/routes.rb`, `config/`, `db/migrate/`, `.github/workflows/`, `spec/` · **Date:** 2026-09-03 · **Commit:** `f1ef803`
 
+## How this review was run
+
+Produced by the project's `/code-review` skill
+([`.claude/skills/code-review/`](../.claude/skills/code-review/)):
+
+- **Config:** [`SKILL.md`](../.claude/skills/code-review/SKILL.md) defines the
+  workflow and this report's format;
+  [`REVIEW_CHECKLIST.md`](../.claude/skills/code-review/REVIEW_CHECKLIST.md) is the
+  checklist walked section by section — Chatter-specific hotspots first (XSS,
+  strong params, coordinate validation, N+1, Action Cable scope, `data-turbo-*`,
+  secrets), then SOLID, Ruby, Rails, Hotwire, and tests.
+- **Baseline:** findings are measured against [`../CLAUDE.md`](../CLAUDE.md) and
+  [`PRD.md`](PRD.md), not assumptions — "keep it simple" and the PRD §3 scope
+  bound what counts as worth fixing.
+- **Gates:** `bin/rubocop`, `bundle exec rspec`, `bin/brakeman`,
+  `bin/importmap audit` (results below).
+- **Output:** findings ranked by importance, each with a fix and a
+  `Fix` / `Optional` / `Skip` call; then what was fixed and what was left, and why.
+
 ## Automated gates
 
 | Gate | Result |
@@ -181,22 +200,28 @@ attribute mismatch, `turnbo_stream_from` typo, `Turbo.visit(url, {frame:})` →
 for the title, CARTO tiles → keyless OpenStreetMap, the layout `<main>` wrapper
 that fought the full-screen map.
 
+**Fixed after this review**
+
+- **#1, #2, #3** :
+  - **#1** — needed to be fixed since it requires the Leaflet instance to be "torn down in `disconnect()`"; it also threw *"Map container is already initialized"* on a Turbo cache restore.
+  - **#2** — needed to be fixed since CI never ran the specs, so a broken one couldn't block a merge.
+  - **#3** — the marker markup was duplicated in two files; duplicated code like this belongs in one shared partial so it can't drift.
+
+- **#7** — the payoff was worth it: routing the map-click POST
+  through a hidden Turbo-driven form deleted ~12 lines of hand-rolled `fetch`
+  plumbing (CSRF header, `Accept` header, `Turbo.renderStreamMessage`) and the
+  brittle `?.content ?? ""` CSRF guard that only existed because raw `fetch`
+  doesn't get the token for free. Net less code, and it follows the
+  "let Turbo do it" convention. Cost was one small hidden `<form>` in the view.
+
+- **#9, #10** — each was a one-line change so they were done in passing
+  rather than deferred.
+
 **Left deliberately:**
 
-- **#4, #5, #7, #8 (`Optional`)** — all real improvements, all low-value against
+- **#6 #8 (`Optional`)** — all real improvements, all low-value against
   PRD §3's scope (trusted input, demo scale, no pagination, `/` as the canonical
-  URL). Worth doing only with time to spare; recorded so the omissions are
-  visible choices, not misses.
-- **#6 (`Optional`)** — the composite index is the "correct" call but adds schema
-  surface for a table that will hold dozens of rows in the demo; first thing to
-  add under real load.
-- **Leaflet CSS from `unpkg`** — the JS is vendored but the stylesheet is a runtime
-  CDN dependency (with SRI). PRD §2.1 explicitly sanctions "Leaflet pinned from a
-  CDN", so `Skip` — vendoring it is a resilience nicety, not a correctness issue.
-- **UTC timestamps** in `_message` — `Skip`; no per-user timezone in a
-  no-accounts app.
+  URL). Recorded so the omissions are visible choices, not misses.
 
-**Follow-ups with more time:** #1 and #2 first (both `Fix`), then #3;
-add an XSS regression spec that posts `<script>` and asserts it's escaped; add the
-`tailwindcss:build` step to CI so system specs get current CSS without the
-`before(:suite)` shell-out.
+
+
